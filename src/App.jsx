@@ -1,45 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import Auth from './components/Auth.jsx';
+import Dashboard from './components/Dashboard.jsx';
 
-function Header() {
+function App() {
+  const [user, setUser] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) setUser(JSON.parse(savedUser));
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setUser(null);
+  };
+
+  const toggleDarkMode = () => setDarkMode((v) => !v);
+
   return (
-    <header>
-      <img src="src/assets/react-logo-xs.png" alt="React logo" />
-      <h1>React Fundamentos</h1>
-      <p>bla bla bla</p>
-    </header>
+    <div className={darkMode ? 'bg-gray-900 text-gray-100 min-h-screen' : 'bg-gray-100 text-gray-900 min-h-screen'}>
+      {user ? (
+        <>
+          <div className="flex justify-between items-center p-6">
+            <h1 className="text-2xl font-bold">ZENTREGO</h1>
+            <div className="flex gap-3">
+              <button onClick={toggleDarkMode} className="px-4 py-2 bg-blue-600 text-white rounded-md">
+                {darkMode ? '🌞 Claro' : '🌙 Oscuro'}
+              </button>
+              <button onClick={handleLogout} className="px-4 py-2 bg-red-600 text-white rounded-md">Salir</button>
+            </div>
+          </div>
+          <Dashboard user={user} darkMode={darkMode} />
+        </>
+      ) : (
+        <Auth onLogin={setUser} darkMode={darkMode} />
+      )}
+    </div>
   );
 }
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
-
-export default App
+export default App;
